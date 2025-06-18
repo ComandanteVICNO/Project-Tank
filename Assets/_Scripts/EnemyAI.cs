@@ -21,8 +21,10 @@ public class EnemyAI : MonoBehaviour
     private GameObject player;
     [SerializeField] NavMeshAgent agent;
     [SerializeField] private Rigidbody rb;
+    [SerializeField] GunProperties turretProperties;
     
-    [Header("Patrol")]
+    
+    [Header("Patrol State Variables")]
     [SerializeField]
     float minNextPointDistance = 5;
     [SerializeField] float maxNextPointDistance = 30;
@@ -31,6 +33,13 @@ public class EnemyAI : MonoBehaviour
     float currentPatrolWaitTime = 0;
     bool hasSelectedNextPoint = false;
     private bool isPatrolWaiting = false;
+    //Turret rotate
+    [SerializeField] private Transform turretTransform;
+    [SerializeField] private float minTurretRotationWaitTime = 1f;
+    [SerializeField] private float maxTurretRotationWaitTime = 4f;
+    float currentTurretRotationWaitTime = 0;
+    private bool isTurretRotated = true;
+    private Vector3 turretTargetRotation;
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -45,6 +54,7 @@ public class EnemyAI : MonoBehaviour
         {
             case EnemyState.Patrol:
                 SelectAndMoveToNewPoint();
+                RotateCanon();
                 break;
             
             case EnemyState.Chase:
@@ -87,7 +97,7 @@ public class EnemyAI : MonoBehaviour
         {
             if (!isPatrolWaiting)
             {
-                currentPatrolWaitTime = Random.Range(patrolMaxWaitTime, patrolMaxWaitTime);
+                currentPatrolWaitTime = Random.Range(patrolMinWaitTime, patrolMaxWaitTime);
                 isPatrolWaiting = true;
                 Debug.Log("Set Waiting time of: " + currentPatrolWaitTime);
             }
@@ -101,7 +111,32 @@ public class EnemyAI : MonoBehaviour
                     isPatrolWaiting = false;
                 }
             }
+        }
+    }
+
+    void RotateCanon()
+    {
+        if (isTurretRotated)
+        {
+            turretTargetRotation =  new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+            currentTurretRotationWaitTime = Random.Range(minTurretRotationWaitTime, maxTurretRotationWaitTime);
+            isTurretRotated = false;
+        }
+        else
+        {
+            Vector3 direction = (turretTargetRotation - turretTransform.localPosition);
             
+            float targetAngle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+            float currentAngle = turretTransform.localEulerAngles.y;
+            
+            float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, turretProperties.rotateSpeed * Time.deltaTime);
+
+            turretTransform.localRotation = Quaternion.Euler(0f, newAngle, 0f);
+            if (Mathf.Abs(Mathf.DeltaAngle(currentAngle, targetAngle)) < 1f)
+            {
+                currentTurretRotationWaitTime -= Time.deltaTime;
+                if (currentTurretRotationWaitTime <= 0) isTurretRotated = true;
+            }
         }
     }
     

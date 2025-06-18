@@ -483,10 +483,14 @@ MonoBehaviour:
   player: {fileID: 0}
   agent: {fileID: 0}
   rb: {fileID: 0}
+  turretProperties: {fileID: 11400000, guid: 8fb9bfeb2e1526941ba3fed8f67ce188, type: 2}
   minNextPointDistance: 5
   maxNextPointDistance: 30
   patrolMaxWaitTime: 7
   patrolMinWaitTime: 1
+  turretTransform: {fileID: 1672355229}
+  minTurretRotationWaitTime: 1
+  maxTurretRotationWaitTime: 4
 --- !u!1 &187569621
 GameObject:
   m_ObjectHideFlags: 0
@@ -1432,6 +1436,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 195303505888080789}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1672355229 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2063947290855744239, guid: dc84a58afe1344547a230a5cb3c072c8, type: 3}
+  m_PrefabInstance: {fileID: 1421851182}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1765612862
 GameObject:
   m_ObjectHideFlags: 0
