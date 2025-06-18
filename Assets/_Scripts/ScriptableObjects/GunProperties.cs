@@ -5,7 +5,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "NewTankGunData", menuName = "Tank/GunData")]
 public class GunProperties : ScriptableObject
 {
-    public float damage;
+    public int damage;
+    public float projectileSpeed;
+    public float projectileLifetime;
     public float fireRate;
     public float range;
     public float rotateSpeed;
