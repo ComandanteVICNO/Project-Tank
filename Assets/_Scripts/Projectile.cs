@@ -10,7 +10,7 @@ public class Projectile : MonoBehaviour
     
     Vector3 projectileDirection;
     float projectileSpeed;
-    private float projectileDamage;
+    private int projectileDamage;
     float projectileLifeTime;
     
     
@@ -43,6 +43,14 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
-    
+
+    private void OnTriggerEnter(Collider other)
+    {
+        IDamageable damageable = other.GetComponent<IDamageable>();
+        if (damageable != null)
+        {
+            damageable.TakeDamage(projectileDamage);
+        }
+        Destroy(gameObject);
+    }
 }
