@@ -44,8 +44,5 @@ public class Projectile : MonoBehaviour
         }
     }
     
-    public virtual void OnTriggerEnter(Collider other)
-    {
-        //Apply damage
-    }
+    
 }

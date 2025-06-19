@@ -1,13 +1,11 @@
 // © 2025 Francisco Gonçalves. All Rights Reserved.
 // For portfolio viewing only – usage or redistribution is prohibited.
-
-using System;
 using UnityEngine;
 
-public class PlayerProjectile : Projectile
+public class EnemyAttack : MonoBehaviour
 {
-    public void OnTriggerEnter(Collider other)
+    public virtual void Attack()
     {
-        Destroy(gameObject);
+        
     }
 }

@@ -25,7 +25,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] GunProperties turretProperties;
     [SerializeField] private TMP_Text text;
-    
+    [SerializeField] private EnemyAttack enemyAttackScript;
     
     [Header("Patrol State Variables")]
     [SerializeField]
@@ -56,7 +56,10 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float viewDistance = 50f;
 
     [Header("Chase State Variables")] 
-    [SerializeField] private float distanceToAttackPlayer = 20f;
+    [SerializeField] private float distanceToAttackPlayer = 15f;
+
+    [Header("Attack state Variables")] 
+    [SerializeField] private float distanceToBreakAttack = 20f;
 
     [Header("Investigate State Variables")] 
     [SerializeField] private float minInvestigationTime = 3f;
@@ -72,7 +75,7 @@ public class EnemyAI : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player");
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
-        
+        enemyAttackScript = GetComponent<EnemyAttack>();
     }
 
     private void Update()
@@ -99,7 +102,9 @@ public class EnemyAI : MonoBehaviour
                 break;
             
             case EnemyState.Attack:
-                
+                RotateCanonToPlayer();
+                CheckIfCanAttack();
+                enemyAttackScript.Attack();
                 break;
             
             default:
@@ -108,7 +113,7 @@ public class EnemyAI : MonoBehaviour
         }
         text.text = currentState.ToString();
 
-        if (IsPlayerInLineOfSight())
+        if (IsPlayerInLineOfSight() && currentState != EnemyState.Investigate)
         {
             lastPlayerPosition = player.transform.position;
         }
@@ -205,7 +210,7 @@ public class EnemyAI : MonoBehaviour
 
         if (distanceToPlayer <= distanceToAttackPlayer && IsPlayerInLineOfSight())
         {
-            //Set mode to attack, still to do;
+            currentState = EnemyState.Attack;
             agent.SetDestination(transform.position);
         }
     }
@@ -251,10 +256,32 @@ public class EnemyAI : MonoBehaviour
             }
             
         }
+        else
+        {
+            RotateCanon();
+        }
     }
 
     #endregion
-    
+
+    #region Attack Logic
+
+    void CheckIfCanAttack()
+    {
+        if (Vector3.Distance(player.transform.position, transform.position) >= distanceToBreakAttack && CanSeePlayerInCone())
+        {
+            currentState = EnemyState.Chase;
+        }
+        else if(!IsPlayerInLineOfSight() )
+        {
+            
+            currentState = EnemyState.Investigate;
+        }
+        
+        
+    }
+
+    #endregion
     
     #region Global Functions
 
