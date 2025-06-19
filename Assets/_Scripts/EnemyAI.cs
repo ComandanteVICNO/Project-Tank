@@ -11,6 +11,7 @@ public class EnemyAI : MonoBehaviour
     public enum EnemyState
     {
         Patrol,
+        Alert,
         Chase, 
         Investigate,
         Attack
@@ -33,7 +34,9 @@ public class EnemyAI : MonoBehaviour
     float currentPatrolWaitTime = 0;
     bool hasSelectedNextPoint = false;
     private bool isPatrolWaiting = false;
+    
     //Turret rotate
+    
     [SerializeField] private Transform turretTransform;
     [SerializeField] private float minTurretRotationWaitTime = 1f;
     [SerializeField] private float maxTurretRotationWaitTime = 4f;
@@ -41,6 +44,10 @@ public class EnemyAI : MonoBehaviour
     private bool isTurretRotated = true;
     private Vector3 turretTargetRotation;
 
+    [Header("Alert State Variables")]
+    [SerializeField] float engageDelayTime = 2f;
+    float currentEngageDelayTime = 0;
+    
     [Header("Player Detection Variables")] 
     [SerializeField]private int rayCount = 7;
     [SerializeField] private float viewAngle = 60f;
@@ -63,10 +70,12 @@ public class EnemyAI : MonoBehaviour
             case EnemyState.Patrol:
                 SelectAndMoveToNewPoint();
                 RotateCanon();
-                bool isPlayerDetected = CanSeePlayerInCone();
-                bool isPlayerInSight = IsPlayerInLineOfSight();
+                if (CanSeePlayerInCone()) currentState = EnemyState.Alert;
                 break;
-            
+            case EnemyState.Alert:
+                DoEngageDelay();
+                
+                break;
             case EnemyState.Chase:
 
                 break;
@@ -92,8 +101,7 @@ public class EnemyAI : MonoBehaviour
     }
 
 
-    //Patrol Logic
-
+    #region Patrol Logic
     void SelectAndMoveToNewPoint()
     {
         if (!hasSelectedNextPoint)
@@ -129,6 +137,49 @@ public class EnemyAI : MonoBehaviour
             }
         }
     }
+    
+    #endregion
+    
+    #region Alert Logic
+
+    void DoEngageDelay()
+    {
+        RotateCanonToPlayer();
+        if (CanSeePlayerInCone())
+        {
+            currentEngageDelayTime += Time.deltaTime;
+            if (currentEngageDelayTime >= engageDelayTime)
+            {
+                currentEngageDelayTime = 0;
+                //currentState = EnemyState.Chase;
+            }
+        }
+        else
+        {
+            currentEngageDelayTime = 0;
+            currentState = EnemyState.Patrol;
+        }
+    }
+    
+    
+    
+    #endregion
+
+    #region Global Functions
+
+    void RotateCanonToPlayer()
+    {
+        
+        Vector3 targetPosition = player.transform.position;
+        
+        Vector3 direction = (targetPosition - turretTransform.position).normalized; 
+        
+        float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg;
+        float currentAngle = turretTransform.eulerAngles.y;
+        
+        float newAngle = Mathf.MoveTowardsAngle(currentAngle, targetAngle, turretProperties.rotateSpeed * Time.deltaTime);
+        turretTransform.rotation = Quaternion.Euler(0,newAngle,0);
+    }
 
     void RotateCanon()
     {
@@ -156,7 +207,9 @@ public class EnemyAI : MonoBehaviour
         }
     }
     
+    #endregion
     
+    #region Player Detection Logic
     //Player Detection
     bool CanSeePlayerInCone()
     {
@@ -214,5 +267,7 @@ public class EnemyAI : MonoBehaviour
         }
         return false;
     }
+    #endregion
+    
     
 }

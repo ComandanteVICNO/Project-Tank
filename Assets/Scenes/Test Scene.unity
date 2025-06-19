@@ -491,6 +491,7 @@ MonoBehaviour:
   turretTransform: {fileID: 1672355229}
   minTurretRotationWaitTime: 1
   maxTurretRotationWaitTime: 4
+  engageDelayTime: 2
   rayCount: 20
   viewAngle: 125
   viewDistance: 30
