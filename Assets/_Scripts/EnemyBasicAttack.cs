@@ -7,6 +7,7 @@ public class EnemyBasicAttack : EnemyAttack
     [SerializeField] private GunProperties turretProperties;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform attackPoint;
+    
     private float timeToAttack = 0;
     
     public override void Attack()

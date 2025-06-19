@@ -786,6 +786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
+  enemyAI: {fileID: 0}
 --- !u!1001 &182998607
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2077,6 +2078,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
+  enemyAI: {fileID: 0}
 --- !u!114 &378507244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4035,6 +4037,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   health: 5
+  enemyAI: {fileID: 0}
 --- !u!114 &793766480
 MonoBehaviour:
   m_ObjectHideFlags: 0

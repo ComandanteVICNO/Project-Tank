@@ -133,7 +133,7 @@ public class EnemyAI : MonoBehaviour
         {
             spotLight.color = alertedColor;
         }
-        else
+        else if(currentState == EnemyState.Chase || currentState == EnemyState.Attack)
         {
             spotLight.color = detectedColor;
         }
