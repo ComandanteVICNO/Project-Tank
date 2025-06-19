@@ -26,6 +26,10 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] GunProperties turretProperties;
     [SerializeField] private TMP_Text text;
     [SerializeField] private EnemyAttack enemyAttackScript;
+    [SerializeField] private Light spotLight;
+    [SerializeField] private Color32 normalColor;
+    [SerializeField] private Color32 detectedColor;
+    
     
     [Header("Patrol State Variables")]
     [SerializeField]
@@ -76,6 +80,8 @@ public class EnemyAI : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         rb = GetComponent<Rigidbody>();
         enemyAttackScript = GetComponent<EnemyAttack>();
+        
+        normalColor = spotLight.color;
     }
 
     private void Update()
@@ -117,6 +123,16 @@ public class EnemyAI : MonoBehaviour
         {
             lastPlayerPosition = player.transform.position;
         }
+
+        if (currentState != EnemyState.Patrol && currentState != EnemyState.Alert)
+        {
+            spotLight.color = detectedColor;
+        }
+        else
+        {
+            spotLight.color = normalColor;
+        }
+        
         
     }
 
