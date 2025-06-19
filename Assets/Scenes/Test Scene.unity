@@ -736,6 +736,9 @@ MonoBehaviour:
   normalColor:
     serializedVersion: 2
     rgba: 0
+  alertedColor:
+    serializedVersion: 2
+    rgba: 681406
   detectedColor:
     serializedVersion: 2
     rgba: 4737192
@@ -2112,6 +2115,9 @@ MonoBehaviour:
   normalColor:
     serializedVersion: 2
     rgba: 0
+  alertedColor:
+    serializedVersion: 2
+    rgba: 681406
   detectedColor:
     serializedVersion: 2
     rgba: 4737192
@@ -4067,6 +4073,9 @@ MonoBehaviour:
   normalColor:
     serializedVersion: 2
     rgba: 0
+  alertedColor:
+    serializedVersion: 2
+    rgba: 681406
   detectedColor:
     serializedVersion: 2
     rgba: 4737192

@@ -28,6 +28,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private EnemyAttack enemyAttackScript;
     [SerializeField] private Light spotLight;
     [SerializeField] private Color32 normalColor;
+    [SerializeField]private Color32 alertedColor;
     [SerializeField] private Color32 detectedColor;
     
     
@@ -124,13 +125,17 @@ public class EnemyAI : MonoBehaviour
             lastPlayerPosition = player.transform.position;
         }
 
-        if (currentState != EnemyState.Patrol && currentState != EnemyState.Alert)
+        if (currentState == EnemyState.Patrol)
         {
-            spotLight.color = detectedColor;
+            spotLight.color = normalColor;
+        }
+        else if (currentState == EnemyState.Alert || currentState== EnemyState.Investigate)
+        {
+            spotLight.color = alertedColor;
         }
         else
         {
-            spotLight.color = normalColor;
+            spotLight.color = detectedColor;
         }
         
         
