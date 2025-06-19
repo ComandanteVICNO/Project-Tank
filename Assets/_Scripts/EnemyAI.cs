@@ -52,6 +52,16 @@ public class EnemyAI : MonoBehaviour
     [SerializeField]private int rayCount = 7;
     [SerializeField] private float viewAngle = 60f;
     [SerializeField] private float viewDistance = 50f;
+
+    [Header("Chase State Variables")] 
+    [SerializeField] private float distanceToAttackPlayer = 20f;
+
+    [Header("Investigate State Variables")] 
+    [SerializeField] private float minInvestigationTime = 3f;
+    [SerializeField] private float maxInvestigationTime = 7f;
+    float investigationTime = 0;
+    float currentInvestigationTime = 0;
+    
     
     [SerializeField] Vector3 lastPlayerPosition = Vector3.zero;
     
@@ -74,13 +84,14 @@ public class EnemyAI : MonoBehaviour
                 break;
             case EnemyState.Alert:
                 DoEngageDelay();
-                
+                RotateCanonToPlayer();
                 break;
             case EnemyState.Chase:
-
+                ChaseAfterPlayer();
                 break;
             
             case EnemyState.Investigate:
+                LookForPlayer();
                 
                 break;
             
@@ -144,14 +155,14 @@ public class EnemyAI : MonoBehaviour
 
     void DoEngageDelay()
     {
-        RotateCanonToPlayer();
+        
         if (CanSeePlayerInCone())
         {
             currentEngageDelayTime += Time.deltaTime;
             if (currentEngageDelayTime >= engageDelayTime)
             {
                 currentEngageDelayTime = 0;
-                //currentState = EnemyState.Chase;
+                currentState = EnemyState.Chase;
             }
         }
         else
@@ -165,6 +176,61 @@ public class EnemyAI : MonoBehaviour
     
     #endregion
 
+    #region Chase Logic
+
+    void ChaseAfterPlayer()
+    {
+        float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
+
+        if (distanceToPlayer > distanceToAttackPlayer && IsPlayerInLineOfSight())
+        {
+            agent.SetDestination(player.transform.position);
+        }
+        else if (distanceToPlayer > distanceToAttackPlayer && !IsPlayerInLineOfSight())
+        {
+            investigationTime = Random.Range(minInvestigationTime, maxInvestigationTime);
+            currentState = EnemyState.Investigate;
+            return;
+        }
+
+        if (distanceToPlayer <= distanceToAttackPlayer && IsPlayerInLineOfSight())
+        {
+            //Set mode to attack, still to do;
+            agent.SetDestination(transform.position);
+        }
+    }
+
+    #endregion
+
+    #region Investigate Logic
+
+    void LookForPlayer()
+    {
+        agent.SetDestination(lastPlayerPosition);
+        if (agent.velocity.magnitude < 0.1f)
+        {
+            currentInvestigationTime += Time.deltaTime;
+            RotateCanon();
+            if (CanSeePlayerInCone())
+            {
+                currentState = EnemyState.Chase;
+                currentInvestigationTime = 0;
+                return;
+            }
+
+            if (currentInvestigationTime >= investigationTime && !CanSeePlayerInCone())
+            {
+                currentState = EnemyState.Patrol;
+                currentInvestigationTime = 0;
+                return;
+            }
+            
+        }
+    }
+
+    #endregion
+    
+    
     #region Global Functions
 
     void RotateCanonToPlayer()
