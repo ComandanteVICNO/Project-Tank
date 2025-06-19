@@ -40,6 +40,14 @@ public class EnemyAI : MonoBehaviour
     float currentTurretRotationWaitTime = 0;
     private bool isTurretRotated = true;
     private Vector3 turretTargetRotation;
+
+    [Header("Player Detection Variables")] 
+    [SerializeField]private int rayCount = 7;
+    [SerializeField] private float viewAngle = 60f;
+    [SerializeField] private float viewDistance = 50f;
+    
+    [SerializeField] Vector3 lastPlayerPosition = Vector3.zero;
+    
     private void Awake()
     {
         player = GameObject.FindGameObjectWithTag("Player");
@@ -55,6 +63,8 @@ public class EnemyAI : MonoBehaviour
             case EnemyState.Patrol:
                 SelectAndMoveToNewPoint();
                 RotateCanon();
+                bool isPlayerDetected = CanSeePlayerInCone();
+                bool isPlayerInSight = IsPlayerInLineOfSight();
                 break;
             
             case EnemyState.Chase:
@@ -73,6 +83,12 @@ public class EnemyAI : MonoBehaviour
                 currentState = EnemyState.Patrol;
                 break;
         }
+
+        if (IsPlayerInLineOfSight())
+        {
+            lastPlayerPosition = player.transform.position;
+        }
+        
     }
 
 
@@ -138,6 +154,65 @@ public class EnemyAI : MonoBehaviour
                 if (currentTurretRotationWaitTime <= 0) isTurretRotated = true;
             }
         }
+    }
+    
+    
+    //Player Detection
+    bool CanSeePlayerInCone()
+    {
+        float halfFieldOfView = viewAngle / 2;
+        float angleIncrement = viewAngle / rayCount;
+        float angleOffset = turretTransform.forward.y - halfFieldOfView;
+        for (int i = 0; i < rayCount; i++)
+        {
+            Vector3 rayDirection = Quaternion.Euler(0, angleOffset, 0) * turretTransform.forward;
+            
+            Vector3 rayOrigin = new Vector3(turretTransform.position.x, turretTransform.position.y, turretTransform.position.z + 0.5f);
+
+            if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, viewDistance))
+            {
+                if (hit.transform.CompareTag("Player"))
+                {
+                    Debug.DrawRay(rayOrigin, rayDirection * hit.distance, Color.green);
+                    return true;
+                }
+                else
+                {
+                    Debug.DrawRay(rayOrigin, rayDirection * hit.distance, Color.yellow);
+                    
+                }
+            }
+            else
+            {
+                Debug.DrawRay(rayOrigin, rayDirection * viewDistance, Color.red);
+            }
+            angleOffset += angleIncrement;
+        }
+        return false;
+    }
+
+    bool IsPlayerInLineOfSight()
+    {
+        Vector3 directionToPlayer = player.transform.position - turretTransform.position;
+        directionToPlayer = new Vector3(directionToPlayer.x, 0, directionToPlayer.z);
+        float angleToPlayer = Mathf.Atan2(directionToPlayer.z,directionToPlayer.x) * Mathf.Rad2Deg;
+        
+        Vector3 rayOrigin = new Vector3(turretTransform.position.x, player.transform.position.y, turretTransform.position.z + 0.5f);
+        Vector3 rayDirection = directionToPlayer.normalized;
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, Mathf.Infinity))
+        {
+            if (hit.collider.CompareTag("Player"))
+            {
+                Debug.DrawRay(rayOrigin, rayDirection * hit.distance, Color.green);
+                return true;
+            }
+            else
+            {
+                Debug.DrawRay(rayOrigin, rayDirection * hit.distance, Color.red);
+            }
+        }
+        return false;
     }
     
 }
