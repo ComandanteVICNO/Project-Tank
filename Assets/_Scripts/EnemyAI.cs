@@ -2,6 +2,7 @@
 // For portfolio viewing only – usage or redistribution is prohibited.
 
 using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
@@ -23,6 +24,7 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] NavMeshAgent agent;
     [SerializeField] private Rigidbody rb;
     [SerializeField] GunProperties turretProperties;
+    [SerializeField] private TMP_Text text;
     
     
     [Header("Patrol State Variables")]
@@ -88,6 +90,7 @@ public class EnemyAI : MonoBehaviour
                 break;
             case EnemyState.Chase:
                 ChaseAfterPlayer();
+                RotateCanonToPlayer();
                 break;
             
             case EnemyState.Investigate:
@@ -103,6 +106,7 @@ public class EnemyAI : MonoBehaviour
                 currentState = EnemyState.Patrol;
                 break;
         }
+        text.text = currentState.ToString();
 
         if (IsPlayerInLineOfSight())
         {
@@ -118,8 +122,14 @@ public class EnemyAI : MonoBehaviour
         if (!hasSelectedNextPoint)
         {
             Vector3 nextPoint = new Vector3(transform.position.x + Random.Range(-maxNextPointDistance,maxNextPointDistance), 0, transform.position.z + Random.Range(-maxNextPointDistance,maxNextPointDistance));
-            hasSelectedNextPoint = true;
             agent.SetDestination(nextPoint);
+            
+            if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
+            {
+               return;
+            }
+            
+            hasSelectedNextPoint = true;
             Debug.Log("Selected Next Point");
             
         }
@@ -128,7 +138,7 @@ public class EnemyAI : MonoBehaviour
 
     void WaitOnPatrolPoint()
     {
-        if (agent.velocity.magnitude < 0.1f)
+        if (agent.velocity.magnitude < 0.1f || (agent.destination-transform.position).magnitude < 0.5f)
         {
             if (!isPatrolWaiting)
             {
@@ -186,7 +196,7 @@ public class EnemyAI : MonoBehaviour
         {
             agent.SetDestination(player.transform.position);
         }
-        else if (distanceToPlayer > distanceToAttackPlayer && !IsPlayerInLineOfSight())
+        else if (!IsPlayerInLineOfSight())
         {
             investigationTime = Random.Range(minInvestigationTime, maxInvestigationTime);
             currentState = EnemyState.Investigate;
@@ -207,7 +217,22 @@ public class EnemyAI : MonoBehaviour
     void LookForPlayer()
     {
         agent.SetDestination(lastPlayerPosition);
-        if (agent.velocity.magnitude < 0.1f)
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(lastPlayerPosition, out hit, 3f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            // Fallback to patrol if the position is invalid
+            Debug.LogWarning("lastPlayerPosition was off NavMesh. Returning to Patrol.");
+            currentState = EnemyState.Patrol;
+            return;
+        }
+
+        if (CanSeePlayerInCone()) currentState = EnemyState.Chase;
+        
+        if (agent.velocity.magnitude < 0.1f|| (agent.destination-transform.position).magnitude < 0.5f)
         {
             currentInvestigationTime += Time.deltaTime;
             RotateCanon();
