@@ -63,6 +63,9 @@ public class EnemyAI : MonoBehaviour
     [Header("Chase State Variables")] 
     [SerializeField] private float distanceToAttackPlayer = 15f;
 
+    [SerializeField] private float timeUntilInvestigate = 0.5f;
+    float currentTimeUntilInvestigate = 0;
+
     [Header("Attack state Variables")] 
     [SerializeField] private float distanceToBreakAttack = 20f;
 
@@ -71,7 +74,8 @@ public class EnemyAI : MonoBehaviour
     [SerializeField] private float maxInvestigationTime = 7f;
     float investigationTime = 0;
     float currentInvestigationTime = 0;
-    
+
+    [SerializeField] private float investigationRotationSpeed;
     
     [SerializeField] Vector3 lastPlayerPosition = Vector3.zero;
     
@@ -91,7 +95,7 @@ public class EnemyAI : MonoBehaviour
         {
             case EnemyState.Patrol:
                 SelectAndMoveToNewPoint();
-                RotateCanon();
+                RandomRotateCanon();
                 if (CanSeePlayerInCone()) currentState = EnemyState.Alert;
                 break;
             case EnemyState.Alert:
@@ -138,6 +142,7 @@ public class EnemyAI : MonoBehaviour
             spotLight.color = detectedColor;
         }
         
+      
         
     }
 
@@ -216,6 +221,7 @@ public class EnemyAI : MonoBehaviour
 
     void ChaseAfterPlayer()
     {
+        
         float distanceToPlayer = Vector3.Distance(player.transform.position, transform.position);
 
         if (distanceToPlayer > distanceToAttackPlayer && IsPlayerInLineOfSight())
@@ -224,9 +230,17 @@ public class EnemyAI : MonoBehaviour
         }
         else if (!IsPlayerInLineOfSight())
         {
-            investigationTime = Random.Range(minInvestigationTime, maxInvestigationTime);
-            currentState = EnemyState.Investigate;
-            return;
+            currentTimeUntilInvestigate += Time.deltaTime;
+            if (currentTimeUntilInvestigate >= timeUntilInvestigate)
+            {
+                investigationTime = Random.Range(minInvestigationTime, maxInvestigationTime);
+                currentState = EnemyState.Investigate;
+                return;
+            }
+        }
+        else
+        {
+            currentTimeUntilInvestigate = 0;
         }
 
         if (distanceToPlayer <= distanceToAttackPlayer && IsPlayerInLineOfSight())
@@ -246,13 +260,14 @@ public class EnemyAI : MonoBehaviour
         NavMeshHit hit;
         if (NavMesh.SamplePosition(lastPlayerPosition, out hit, 3f, NavMesh.AllAreas))
         {
+            Debug.Log("This Shit");
             agent.SetDestination(hit.position);
         }
         else
         {
             // Fallback to patrol if the position is invalid
             Debug.LogWarning("lastPlayerPosition was off NavMesh. Returning to Patrol.");
-            currentState = EnemyState.Patrol;
+            currentState = EnemyState.Chase;
             return;
         }
 
@@ -261,7 +276,8 @@ public class EnemyAI : MonoBehaviour
         if (agent.velocity.magnitude < 0.1f|| (agent.destination-transform.position).magnitude < 0.5f)
         {
             currentInvestigationTime += Time.deltaTime;
-            RotateCanon();
+            //RandomRotateCanon();
+            LoopCannon();
             if (CanSeePlayerInCone())
             {
                 currentState = EnemyState.Chase;
@@ -279,10 +295,19 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
-            RotateCanon();
+            RandomRotateCanon();
         }
     }
 
+
+    void LoopCannon()
+    {
+        float rotationSpeed = turretProperties.rotateSpeed;
+        float newAngle = turretTransform.eulerAngles.y + rotationSpeed * Time.deltaTime;
+        turretTransform.rotation = Quaternion.Euler(0f, newAngle % 360f, 0f);
+    }
+    
+    
     #endregion
 
     #region Attack Logic
@@ -320,7 +345,7 @@ public class EnemyAI : MonoBehaviour
         turretTransform.rotation = Quaternion.Euler(0,newAngle,0);
     }
 
-    void RotateCanon()
+    void RandomRotateCanon()
     {
         if (isTurretRotated)
         {

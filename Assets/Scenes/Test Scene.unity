@@ -754,9 +754,11 @@ MonoBehaviour:
   viewAngle: 125
   viewDistance: 30
   distanceToAttackPlayer: 20
+  timeUntilInvestigate: 0.2
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &154726060
 MonoBehaviour:
@@ -2135,9 +2137,11 @@ MonoBehaviour:
   viewAngle: 125
   viewDistance: 30
   distanceToAttackPlayer: 20
+  timeUntilInvestigate: 0.2
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!195 &378507246
 NavMeshAgent:
@@ -4094,9 +4098,11 @@ MonoBehaviour:
   viewAngle: 125
   viewDistance: 30
   distanceToAttackPlayer: 20
+  timeUntilInvestigate: 0.2
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!195 &793766482
 NavMeshAgent:
