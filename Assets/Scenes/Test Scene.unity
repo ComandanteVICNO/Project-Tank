@@ -758,6 +758,7 @@ MonoBehaviour:
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  lastPlayerPositionOffset: 3
   investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!114 &154726060
@@ -2141,6 +2142,7 @@ MonoBehaviour:
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  lastPlayerPositionOffset: 3
   investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!195 &378507246
@@ -4102,6 +4104,7 @@ MonoBehaviour:
   distanceToBreakAttack: 20
   minInvestigationTime: 3
   maxInvestigationTime: 7
+  lastPlayerPositionOffset: 3
   investigationRotationSpeed: 0
   lastPlayerPosition: {x: 0, y: 0, z: 0}
 --- !u!195 &793766482

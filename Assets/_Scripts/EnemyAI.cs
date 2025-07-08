@@ -65,6 +65,7 @@ public class EnemyAI : MonoBehaviour
 
     [SerializeField] private float timeUntilInvestigate = 0.5f;
     float currentTimeUntilInvestigate = 0;
+    private bool lostSightLastFrame = false;
 
     [Header("Attack state Variables")] 
     [SerializeField] private float distanceToBreakAttack = 20f;
@@ -72,6 +73,9 @@ public class EnemyAI : MonoBehaviour
     [Header("Investigate State Variables")] 
     [SerializeField] private float minInvestigationTime = 3f;
     [SerializeField] private float maxInvestigationTime = 7f;
+    [SerializeField] private float lastPlayerPositionOffset = 2f;
+    Vector3 investigationDestination = Vector3.zero;
+    bool hasSetInvestigationDestination = false;
     float investigationTime = 0;
     float currentInvestigationTime = 0;
 
@@ -153,7 +157,8 @@ public class EnemyAI : MonoBehaviour
         if (!hasSelectedNextPoint)
         {
             Vector3 nextPoint = new Vector3(transform.position.x + Random.Range(-maxNextPointDistance,maxNextPointDistance), 0, transform.position.z + Random.Range(-maxNextPointDistance,maxNextPointDistance));
-            agent.SetDestination(nextPoint);
+            SetAgentDestination(nextPoint);
+            //agent.SetDestination(nextPoint);
             
             if (!agent.hasPath || agent.pathStatus == NavMeshPathStatus.PathInvalid)
             {
@@ -226,27 +231,40 @@ public class EnemyAI : MonoBehaviour
 
         if (distanceToPlayer > distanceToAttackPlayer && IsPlayerInLineOfSight())
         {
-            agent.SetDestination(player.transform.position);
+            SetAgentDestination(player.transform.position);
+            //agent.SetDestination(player.transform.position);
         }
         else if (!IsPlayerInLineOfSight())
         {
+
+            if (!lostSightLastFrame)
+            {
+                lostSightLastFrame = true;
+                currentTimeUntilInvestigate = 0;
+            }
+            
             currentTimeUntilInvestigate += Time.deltaTime;
+            
             if (currentTimeUntilInvestigate >= timeUntilInvestigate)
             {
                 investigationTime = Random.Range(minInvestigationTime, maxInvestigationTime);
+                
+                investigationDestination = lastPlayerPosition + new Vector3(Random.Range(-lastPlayerPositionOffset, lastPlayerPositionOffset), 0, Random.Range(-lastPlayerPositionOffset, lastPlayerPositionOffset));
+                hasSetInvestigationDestination = false;
                 currentState = EnemyState.Investigate;
                 return;
             }
         }
         else
         {
-            currentTimeUntilInvestigate = 0;
+            lostSightLastFrame = false;
         }
 
         if (distanceToPlayer <= distanceToAttackPlayer && IsPlayerInLineOfSight())
         {
             currentState = EnemyState.Attack;
-            agent.SetDestination(transform.position);
+            SetAgentDestination(transform.position);
+            //agent.SetDestination(transform.position);
         }
     }
 
@@ -256,22 +274,33 @@ public class EnemyAI : MonoBehaviour
 
     void LookForPlayer()
     {
-        agent.SetDestination(lastPlayerPosition);
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(lastPlayerPosition, out hit, 3f, NavMesh.AllAreas))
+        if (!hasSetInvestigationDestination)
         {
-            Debug.Log("This Shit");
-            agent.SetDestination(hit.position);
+            NavMeshHit hit;
+            if (NavMesh.SamplePosition(investigationDestination, out hit, 3f, NavMesh.AllAreas))
+            {
+                Debug.Log("This Shit");
+                SetAgentDestination(hit.position);
+                //agent.SetDestination(hit.position);
+            }
+            else
+            {
+                // // Fallback to patrol if the position is invalid
+                // Debug.LogWarning("lastPlayerPosition was off NavMesh. Returning to Patrol.");
+                // currentState = EnemyState.Chase;
+                // return;
+            
+                lastPlayerPosition = Vector3.zero;
+                currentState = EnemyState.Patrol;
+
+
+            }
         }
-        else
+        if (CanSeePlayerInCone())
         {
-            // Fallback to patrol if the position is invalid
-            Debug.LogWarning("lastPlayerPosition was off NavMesh. Returning to Patrol.");
             currentState = EnemyState.Chase;
             return;
         }
-
-        if (CanSeePlayerInCone()) currentState = EnemyState.Chase;
         
         if (agent.velocity.magnitude < 0.1f|| (agent.destination-transform.position).magnitude < 0.5f)
         {
@@ -434,4 +463,14 @@ public class EnemyAI : MonoBehaviour
     #endregion
     
     
+    
+    
+    void SetAgentDestination(Vector3 targetPosition)
+    {
+        // Only set the destination if it differs significantly from the current one
+        if (Vector3.Distance(agent.destination, targetPosition) > 0.5f)
+        {
+            agent.SetDestination(targetPosition);
+        }
+    }
 }
