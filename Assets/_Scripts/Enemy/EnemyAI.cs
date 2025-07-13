@@ -126,7 +126,7 @@ public class EnemyAI : MonoBehaviour
                 currentState = EnemyState.Patrol;
                 break;
         }
-        text.text = currentState.ToString();
+        //text.text = currentState.ToString();
 
         if (IsPlayerInLineOfSight() && currentState != EnemyState.Investigate)
         {
