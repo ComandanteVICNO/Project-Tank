@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] TMP_Text scoreTextElement;
     [SerializeField] TMP_Text timerTextElement;
+    [SerializeField] TMP_Text healthTextElement;
     
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] TMP_Text gameOverScoreTextElement;
@@ -41,6 +42,11 @@ public class UIManager : MonoBehaviour
         string formattedTime = string.Format("{0:00}:{1:00}", minutes, seconds);
 
         timerTextElement.text = formattedTime;
+    }
+
+    public void UpdateHealthText(int currentHealth, int maxHealth)
+    {
+        healthTextElement.text = "Health: " + currentHealth + " / " + maxHealth;
     }
 
     public void EndGame()
