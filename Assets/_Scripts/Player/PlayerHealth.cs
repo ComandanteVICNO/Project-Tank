@@ -17,6 +17,7 @@ public class PlayerHealth : MonoBehaviour, IDamageable
     {
         if (health <= 0)
         {
+            UIManager.instance.EndGame();
             Destroy(gameObject);
         }
     }

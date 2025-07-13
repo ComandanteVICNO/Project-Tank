@@ -24,6 +24,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        gameTimer += Time.deltaTime;
+        UIManager.instance.UpdateTimer(gameTimer);
+    }
+
 
     public void AddScore(int scoreToAdd)
     {
@@ -36,6 +42,16 @@ public class GameManager : MonoBehaviour
         gameScore -= scoreToSubtract;
         UIManager.instance.UpdateScoreText(gameScore);
     }
-    
+
+    public int GetGameScore()
+    {
+        int finalGameTimeInSeconds = (int)gameTimer;
+        
+        int finalGameScore = gameScore + (finalGameTimeInSeconds * 5);
+        
+        Debug.Log("Game lasted: " + finalGameTimeInSeconds + "  seconds | With each second being 5 points, final time score was: " + (finalGameTimeInSeconds * 5));
+        
+        return finalGameScore;
+    }
     
 }

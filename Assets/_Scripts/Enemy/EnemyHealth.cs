@@ -6,12 +6,16 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
-    [SerializeField] private int health = 5;
+    [SerializeField] private int health = 4;
+    [SerializeField] private int damagedHealth;
     [SerializeField] private EnemyAI enemyAI;
-
+    [SerializeField] private int scoreWhenKilled;
+    [SerializeField] private ParticleSystem damageParticles;
+    [SerializeField] private GameObject destroyParticles;
     private void Awake()
     {
         enemyAI = GetComponent<EnemyAI>();
+        damageParticles.gameObject.SetActive(false);
     }
 
     public void TakeDamage(int damage)
@@ -26,8 +30,22 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        if (health <= damagedHealth)
+        {
+            damageParticles.gameObject.SetActive(true); 
+            damageParticles.Play();
+        }
         if (health <= 0)
         {
+            GameManager.instance.AddScore(scoreWhenKilled);
+            
+            
+            GameObject deathParticles = Instantiate(destroyParticles, transform.position, Quaternion.identity);
+            ParticleSystem ps = deathParticles.GetComponent<ParticleSystem>();
+            ps.Play();
+            Destroy(deathParticles, 5f);
+            
+            
             Destroy(gameObject);
         }
     }
