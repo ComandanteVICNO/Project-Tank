@@ -13,9 +13,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] TMP_Text scoreTextElement;
     [SerializeField] TMP_Text timerTextElement;
     [SerializeField] TMP_Text healthTextElement;
+    [SerializeField] TMP_Text creditsTextElement;
     
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] TMP_Text gameOverScoreTextElement;
+    [SerializeField] TMP_Text gameOverCreditsTextElement;
     private void Awake()
     {
         if (instance == null)
@@ -26,6 +28,16 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+
+    private void Start()
+    {
+        creditsTextElement.text = "Credits: "+ SaveDataManager.instance.saveData.playerCredits;
+        gameOverCreditsTextElement.text = "Credits: "+ SaveDataManager.instance.saveData.playerCredits;
+        
+        SaveDataManager.instance.onCreditsChanged.AddListener(UpdateCreditsText);
+        
     }
 
 
@@ -49,15 +61,22 @@ public class UIManager : MonoBehaviour
         healthTextElement.text = "Health: " + currentHealth + " / " + maxHealth;
     }
 
-    public void EndGame()
+    public void ActivateEndGameUI(int finalScore)
     {
         gameOverPanel.SetActive(true);
-        gameOverScoreTextElement.text = "Score: " + GameManager.instance.GetGameScore();
+        gameOverScoreTextElement.text = "Score: " + finalScore;
     }
     
-    public void RestartGame()
+    public void ReturnToMenu(int index)
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(index);
     }
+
+    void UpdateCreditsText(int currentCredits)
+    {
+        creditsTextElement.text = "Credits: "+ currentCredits;
+        gameOverCreditsTextElement.text = "Credits: "+ currentCredits;
+    }
+
     
 }

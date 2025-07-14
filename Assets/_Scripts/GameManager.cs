@@ -52,5 +52,13 @@ public class GameManager : MonoBehaviour
         
         return finalGameScore;
     }
+
+    public void EndGame()
+    {
+        isGameOver = true;
+        UIManager.instance.ActivateEndGameUI(GetGameScore());
+        SaveDataManager.instance.UpdatePlayerCredits(GetGameScore());
+    }
+    
     
 }
