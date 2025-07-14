@@ -242,7 +242,7 @@ MonoBehaviour:
   health: 3
   damagedHealth: 1
   enemyAI: {fileID: 0}
-  scoreWhenKilled: 100
+  scoreWhenKilled: 20
   damageParticles: {fileID: 8824945398930081365}
   destroyParticles: {fileID: 191186, guid: 079954accd64b32419ec069129c81273, type: 3}
 --- !u!1 &6832674345321611298

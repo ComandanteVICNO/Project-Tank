@@ -6096,6 +6096,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gameScore: 0
   gameTimer: 0
+  pointsPerSecond: 2
 --- !u!4 &1402139561
 Transform:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour
     public static GameManager instance;
     [SerializeField] int gameScore;
     [SerializeField] private float gameTimer;
+    [SerializeField] private int pointsPerSecond;
      
      bool isGameOver;
     
@@ -47,9 +48,7 @@ public class GameManager : MonoBehaviour
     {
         int finalGameTimeInSeconds = (int)gameTimer;
         
-        int finalGameScore = gameScore + (finalGameTimeInSeconds * 5);
-        
-        Debug.Log("Game lasted: " + finalGameTimeInSeconds + "  seconds | With each second being 5 points, final time score was: " + (finalGameTimeInSeconds * 5));
+        int finalGameScore = gameScore + (finalGameTimeInSeconds * pointsPerSecond);
         
         return finalGameScore;
     }

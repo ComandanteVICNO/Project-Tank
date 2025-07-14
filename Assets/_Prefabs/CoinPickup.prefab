@@ -122,7 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ea7165f7b4f5df4ca26e51a0f76254a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickupScoreAmmount: 50
+  pickupScoreAmmount: 40
   coinPickupVisualObject: {fileID: 5731037258288855865}
   timeUntilRespawn: 60
 --- !u!1 &5731037258288855865
